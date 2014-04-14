@@ -586,8 +586,10 @@ typedef struct{
 
 class ParseXML
 {
+    
+    void parse(XMLNode &xMainNode);
 public:
-	void parse(char* filepath);
+	void parse(const char* filepath);
     void initialize();
 public:
 	root_system sys;

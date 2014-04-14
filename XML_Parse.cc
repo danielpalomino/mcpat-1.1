@@ -38,16 +38,20 @@
 
 using namespace std;
 
-void ParseXML::parse(char* filepath)
+void ParseXML::parse(const char* filepath)
+{
+    // this open and parse the XML file:
+    XMLNode xMainNode=XMLNode::openFileHelper(filepath,"component"); //the 'component' in the first layer
+    parse(xMainNode);
+}
+
+void ParseXML::parse(XMLNode &xMainNode)
 {
 	unsigned int i,j,k,m,n;
 	unsigned int NumofCom_4;
 	unsigned int itmp;
 	//Initialize all structures
 	ParseXML::initialize();
-
-	// this open and parse the XML file:
-	XMLNode xMainNode=XMLNode::openFileHelper(filepath,"component"); //the 'component' in the first layer
 
 	XMLNode xNode2=xMainNode.getChildNode("component"); // the 'component' in the second layer
 	//get all params in the second layer
