@@ -1,3 +1,13 @@
+/**
+ * @author Sascha Friedmann <friedman@informatik.uka.de>
+ *
+ * The StreamListener class reads from an input stream and continuously
+ * (re-)computes the energy consumption. It is written to the standard output
+ * stream.
+ */
+#ifndef STREAMLISTENER_H_
+#define STREAMLISTENER_H_
+
 #include <iosfwd>
 #include <string>
 #include "processor.h"
@@ -41,3 +51,5 @@ private:
     static const std::string endtag;
 };
 
+
+#endif /* STREAMLISTENER_H_ */
