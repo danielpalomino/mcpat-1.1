@@ -1329,7 +1329,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 		}
                 xml_level--;
 		//__________________________________________Get system.mem____________________________________________
-		if (OrderofComponents_3layer>0) OrderofComponents_3layer=OrderofComponents_3layer+1;
+		/* if (OrderofComponents_3layer>0) */ OrderofComponents_3layer=OrderofComponents_3layer+1;
 		xNode3=xNode2.getChildNode("component",OrderofComponents_3layer);
                 
                 NREPORT(xml_level+1, "reading system.mem");
@@ -1373,7 +1373,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 		}
                 xml_level--;
 		//__________________________________________Get system.mc____________________________________________
-		if (OrderofComponents_3layer>0) OrderofComponents_3layer=OrderofComponents_3layer+1;
+		/* if (OrderofComponents_3layer>0) */ OrderofComponents_3layer=OrderofComponents_3layer+1;
 		xNode3=xNode2.getChildNode("component",OrderofComponents_3layer);
 		
                 NREPORT(xml_level+1, "reading system.mc");
@@ -1423,7 +1423,7 @@ void ParseXML::parse(XMLNode &xMainNode)
                 xml_level--;
                 
 		//__________________________________________Get system.niu____________________________________________
-		if (OrderofComponents_3layer>0) OrderofComponents_3layer=OrderofComponents_3layer+1;
+		/* if (OrderofComponents_3layer>0) */ OrderofComponents_3layer=OrderofComponents_3layer+1;
 		xNode3=xNode2.getChildNode("component",OrderofComponents_3layer);
                 NREPORT(xml_level+1, "reading system.niu");
 
@@ -1460,7 +1460,7 @@ void ParseXML::parse(XMLNode &xMainNode)
                 xml_level--;
 
 		//__________________________________________Get system.pcie____________________________________________
-		if (OrderofComponents_3layer>0) OrderofComponents_3layer=OrderofComponents_3layer+1;
+		/* if (OrderofComponents_3layer>0) */ OrderofComponents_3layer=OrderofComponents_3layer+1;
 		xNode3=xNode2.getChildNode("component",OrderofComponents_3layer);
                 
                 NREPORT(xml_level+1, "reading system.pcie");
@@ -1500,7 +1500,7 @@ void ParseXML::parse(XMLNode &xMainNode)
                 xml_level--;
                 
 		//__________________________________________Get system.flashcontroller____________________________________________
-		if (OrderofComponents_3layer>0) OrderofComponents_3layer=OrderofComponents_3layer+1;
+		/* if (OrderofComponents_3layer>0) */ OrderofComponents_3layer=OrderofComponents_3layer+1;
 		xNode3=xNode2.getChildNode("component",OrderofComponents_3layer);
                 NREPORT(xml_level+1, "reading system.flashc");
 
