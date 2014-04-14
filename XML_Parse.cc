@@ -31,10 +31,14 @@
 
 
 #include <stdio.h>
+#include <cassert>
 #include "xmlParser.h"
 #include <string>
 #include "XML_Parse.h"
 #include <iostream>
+#include "debug.h"
+
+static const bool __report_enabled = true;
 
 using namespace std;
 
@@ -61,6 +65,7 @@ void ParseXML::parse(const char* filepath)
 
 void ParseXML::parse(XMLNode &xMainNode)
 {
+        unsigned int xml_level = 0; // We don 't count the root component
 	unsigned int i,j,k,m,n;
 	unsigned int NumofCom_4;
 	unsigned int itmp;
@@ -68,7 +73,9 @@ void ParseXML::parse(XMLNode &xMainNode)
 	ParseXML::initialize();
 
 	XMLNode xNode2=xMainNode.getChildNode("component"); // the 'component' in the second layer
+        NREPORT(xml_level, "component %s", xNode2.getAttribute("name"));
 	//get all params in the second layer
+        NREPORT(xml_level+1, "reading params");
 	itmp=xNode2.nChildNode("param");
 	for(i=0; i<itmp; i++)
 	{
@@ -121,6 +128,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 //		cout<<"Private L2: Number of L2s must equal to Number of Cores"<<endl;
 //		exit(0);
 //	}
+        
+        NREPORT(xml_level+1, "reading stats");
 
 	itmp=xNode2.nChildNode("stat");
 	for(i=0; i<itmp; i++)
@@ -143,8 +152,14 @@ void ParseXML::parse(XMLNode &xMainNode)
 		//___________________________get all system.core0-n________________________________________________
 		if (sys.homogeneous_cores==1) OrderofComponents_3layer=0;
 		else OrderofComponents_3layer=sys.number_of_cores-1;
+                
+                NREPORT(xml_level+1, "reading %u cores (homogeneous: %s)", OrderofComponents_3layer+1, REPORT_YESNO(sys.homogeneous_cores));
+
+                xml_level++;
+                
 		for (i=0; i<=OrderofComponents_3layer; i++)
 		{
+                    NREPORT(xml_level, "reading core %u", i+1);
 			xNode3=xNode2.getChildNode("component",i);
 			if (xNode3.isEmpty()==1) {
 				printf("The value of homogeneous_cores or number_of_cores is not correct!");
@@ -154,6 +169,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 				if (strstr(xNode3.getAttribute("name"),"core")!=NULL)
 				{
 					{ //For cpu0-cpui
+                                                
+                                                NREPORT(xml_level+1, "reading params");
 						//Get all params with system.core?
 						itmp=xNode3.nChildNode("param");
 						for(k=0; k<itmp; k++)
@@ -250,6 +267,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 							if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"RAS_size")==0) {sys.core[i].RAS_size=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
 						}
 						//Get all stats with system.core?
+                                                NREPORT(xml_level+1, "reading stats");
 						itmp=xNode3.nChildNode("stat");
 						for(k=0; k<itmp; k++)
 						{
@@ -330,11 +348,19 @@ void ParseXML::parse(XMLNode &xMainNode)
 					}
 
 					NumofCom_4=xNode3.nChildNode("component"); //get the number of components within the third layer
+                                        
+                                        NREPORT(xml_level, "reading %u cpu components", NumofCom_4);
+
+                                        xml_level++;
+                                        
 					for(j=0; j<NumofCom_4; j++)
 					{
 						xNode4=xNode3.getChildNode("component",j);
+                                                NREPORT(xml_level, "reading component %u: %s", j+1, xNode4.getAttribute("name"));
+                                                
 						if (strcmp(xNode4.getAttribute("name"),"PBT")==0)
 						{ //find PBT
+                                                        NREPORT(xml_level+1, "reading params");
 							itmp=xNode4.nChildNode("param");
 							for(k=0; k<itmp; k++)
 							{ //get all items of param in system.core0.predictor--PBT
@@ -370,6 +396,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 								if (strcmp(xNode4.getChildNode("param",k).getAttribute("name"),"chooser_predictor_entries")==0) {sys.core[i].predictor.chooser_predictor_entries=atoi(xNode4.getChildNode("param",k).getAttribute("value"));continue;}
 								if (strcmp(xNode4.getChildNode("param",k).getAttribute("name"),"chooser_predictor_bits")==0) {sys.core[i].predictor.chooser_predictor_bits=atoi(xNode4.getChildNode("param",k).getAttribute("value"));continue;}
 							}
+                                                        NREPORT(xml_level+1, "reading stats");
+                                                        
 							itmp=xNode4.nChildNode("stat");
 							for(k=0; k<itmp; k++)
 							{ //get all items of stat in system.core0.predictor--PBT
@@ -378,11 +406,14 @@ void ParseXML::parse(XMLNode &xMainNode)
 						}
 						if (strcmp(xNode4.getAttribute("name"),"itlb")==0)
 						{//find system.core0.itlb
+                                                    
+                                                        NREPORT(xml_level+1, "reading params");
 							itmp=xNode4.nChildNode("param");
 							for(k=0; k<itmp; k++)
 							{ //get all items of param in system.core0.itlb--itlb
 								if (strcmp(xNode4.getChildNode("param",k).getAttribute("name"),"number_entries")==0) sys.core[i].itlb.number_entries=atoi(xNode4.getChildNode("param",k).getAttribute("value"));
 							}
+                                                        NREPORT(xml_level+1, "reading stats");
 							itmp=xNode4.nChildNode("stat");
 							for(k=0; k<itmp; k++)
 							{ //get all items of stat in itlb
@@ -394,6 +425,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 						}
 						if (strcmp(xNode4.getAttribute("name"),"icache")==0)
 						{//find system.core0.icache
+                                                        NREPORT(xml_level+1, "reading params");
 							itmp=xNode4.nChildNode("param");
 							for(k=0; k<itmp; k++)
 							{ //get all items of param in system.core0.icache--icache
@@ -441,6 +473,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 									chtmp1[0]='\0';
 								}
 							}
+                                                        NREPORT(xml_level+1, "reading stats");
 							itmp=xNode4.nChildNode("stat");
 							for(k=0; k<itmp; k++)
 							{
@@ -462,11 +495,13 @@ void ParseXML::parse(XMLNode &xMainNode)
 						}
 						if (strcmp(xNode4.getAttribute("name"),"dtlb")==0)
 						{//find system.core0.dtlb
+                                                        NREPORT(xml_level+1, "reading params");
 							itmp=xNode4.nChildNode("param");
 							for(k=0; k<itmp; k++)
 							{ //get all items of param in system.core0.dtlb--dtlb
 								if (strcmp(xNode4.getChildNode("param",k).getAttribute("name"),"number_entries")==0) sys.core[i].dtlb.number_entries=atoi(xNode4.getChildNode("param",k).getAttribute("value"));
 							}
+                                                        NREPORT(xml_level+1, "reading stats");
 							itmp=xNode4.nChildNode("stat");
 							for(k=0; k<itmp; k++)
 							{ //get all items of stat in dtlb
@@ -485,6 +520,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 						}
 						if (strcmp(xNode4.getAttribute("name"),"dcache")==0)
 						{//find system.core0.dcache
+                                                        NREPORT(xml_level+1, "reading params");
 							itmp=xNode4.nChildNode("param");
 							for(k=0; k<itmp; k++)
 							{ //get all items of param in system.core0.dcache--dcache
@@ -532,6 +568,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 									chtmp1[0]='\0';
 								}
 							}
+                                                        NREPORT(xml_level+1, "reading stats");
 							itmp=xNode4.nChildNode("stat");
 							for(k=0; k<itmp; k++)
 							{ //get all items of stat in dcache
@@ -560,6 +597,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 						}
 						if (strcmp(xNode4.getAttribute("name"),"BTB")==0)
 						{//find system.core0.BTB
+                                                        NREPORT(xml_level+1, "reading params");
 							itmp=xNode4.nChildNode("param");
 							for(k=0; k<itmp; k++)
 							{ //get all items of param in system.core0.BTB--BTB
@@ -585,6 +623,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 									chtmp1[0]='\0';
 								}
 							}
+                                                        NREPORT(xml_level+1, "reading stats");
 							itmp=xNode4.nChildNode("stat");
 							for(k=0; k<itmp; k++)
 							{ //get all items of stat in BTB
@@ -601,6 +640,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 							}
 						}
 					}
+                                        xml_level--;
 				}
 				else {
 					printf("The value of homogeneous_cores or number_of_cores is not correct!");
@@ -608,6 +648,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 				}
 			}
 		}
+                
+                xml_level--;
 
 		//__________________________________________Get system.L1Directory0-n____________________________________________
 		int w,tmpOrderofComponents_3layer;
@@ -616,8 +658,13 @@ void ParseXML::parse(XMLNode &xMainNode)
 		if (sys.homogeneous_L1Directories==1) OrderofComponents_3layer=OrderofComponents_3layer+1;
 		else OrderofComponents_3layer=OrderofComponents_3layer+sys.number_of_L1Directories;
 
+                NREPORT(xml_level+1, "reading %u L1 directories (homogeneous: %s)", (OrderofComponents_3layer-tmpOrderofComponents_3layer), REPORT_YESNO(sys.homogeneous_L1Directories));
+
+                xml_level++;
+                
 		for (i=0; i<(OrderofComponents_3layer-tmpOrderofComponents_3layer); i++)
 		{
+                    NREPORT(xml_level, "reading L1 directory %d", i+1);
 			xNode3=xNode2.getChildNode("component",w);
 			if (xNode3.isEmpty()==1) {
 				printf("The value of homogeneous_L1Directories or number_of_L1Directories is not correct!");
@@ -627,6 +674,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 			{
 				if (strstr(xNode3.getAttribute("id"),"L1Directory")!=NULL)
 				{
+                                    NREPORT(xml_level+1, "reading params");
 					itmp=xNode3.nChildNode("param");
 					for(k=0; k<itmp; k++)
 					{ //get all items of param in system.L1Directory
@@ -703,6 +751,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 						if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"Directory_type")==0) {sys.L1Directory[i].Directory_type=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
 						if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"3D_stack")==0) {strcpy(sys.L1Directory[i].threeD_stack,xNode3.getChildNode("param",k).getAttribute("value"));continue;}
 					}
+                                        NREPORT(xml_level+1, "reading stats");
+                                        
 					itmp=xNode3.nChildNode("stat");
 					for(k=0; k<itmp; k++)
 					{ //get all items of stat in system.L2directorydirectory
@@ -722,6 +772,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 				}
 			}
 		}
+                
+                xml_level--;
 
 		//__________________________________________Get system.L2Directory0-n____________________________________________
 		w=OrderofComponents_3layer+1;
@@ -729,8 +781,14 @@ void ParseXML::parse(XMLNode &xMainNode)
 		if (sys.homogeneous_L2Directories==1) OrderofComponents_3layer=OrderofComponents_3layer+1;
 		else OrderofComponents_3layer=OrderofComponents_3layer+sys.number_of_L2Directories;
 
+                NREPORT(xml_level+1, "reading %u L2 directories (homogeneous: %s)", (OrderofComponents_3layer-tmpOrderofComponents_3layer), REPORT_YESNO(sys.homogeneous_L2Directories));
+
+                xml_level++;
+                
 		for (i=0; i<(OrderofComponents_3layer-tmpOrderofComponents_3layer); i++)
 		{
+                    
+                        NREPORT(xml_level, "reading L2 directory %u", i+1);
 			xNode3=xNode2.getChildNode("component",w);
 			if (xNode3.isEmpty()==1) {
 				printf("The value of homogeneous_L2Directories or number_of_L2Directories is not correct!");
@@ -740,6 +798,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 			{
 				if (strstr(xNode3.getAttribute("id"),"L2Directory")!=NULL)
 				{
+                                        NREPORT(xml_level+1, "reading params");
 					itmp=xNode3.nChildNode("param");
 					for(k=0; k<itmp; k++)
 					{ //get all items of param in system.L2Directory
@@ -816,6 +875,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 						if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"device_type")==0) {sys.L2Directory[i].device_type=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
 						if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"3D_stack")==0) {strcpy(sys.L2Directory[i].threeD_stack,xNode3.getChildNode("param",k).getAttribute("value"));continue;}
 					}
+                                        NREPORT(xml_level+1, "reading stats");
 					itmp=xNode3.nChildNode("stat");
 					for(k=0; k<itmp; k++)
 					{ //get all items of stat in system.L2directorydirectory
@@ -836,6 +896,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 				}
 			}
 		}
+                
+                xml_level--;
 
 		//__________________________________________Get system.L2[0..n]____________________________________________
 		w=OrderofComponents_3layer+1;
@@ -843,8 +905,13 @@ void ParseXML::parse(XMLNode &xMainNode)
 		if (sys.homogeneous_L2s==1) OrderofComponents_3layer=OrderofComponents_3layer+1;
 		else OrderofComponents_3layer=OrderofComponents_3layer+sys.number_of_L2s;
 
+                NREPORT(xml_level+1, "reading %u L2 caches (homogeneous: %s)", (OrderofComponents_3layer-tmpOrderofComponents_3layer), REPORT_YESNO(sys.homogeneous_L2s));
+
+                xml_level++;
+                
 		for (i=0; i<(OrderofComponents_3layer-tmpOrderofComponents_3layer); i++)
 		{
+                        NREPORT(xml_level, "reading L2 cache %u", i+1);
 			xNode3=xNode2.getChildNode("component",w);
 			if (xNode3.isEmpty()==1) {
 				printf("The value of homogeneous_L2s or number_of_L2s is not correct!");
@@ -856,6 +923,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 				{
 					{ //For L20-L2i
 						//Get all params with system.L2?
+                                                NREPORT(xml_level+1, "reading params");
 						itmp=xNode3.nChildNode("param");
 						for(k=0; k<itmp; k++)
 						{
@@ -931,6 +999,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 								continue;
 							}
 						}
+                                                NREPORT(xml_level+1, "reading stats");
 						//Get all stats with system.L2?
 						itmp=xNode3.nChildNode("stat");
 						for(k=0; k<itmp; k++)
@@ -975,14 +1044,20 @@ void ParseXML::parse(XMLNode &xMainNode)
 				}
 			}
 		}
+                xml_level--;
 		//__________________________________________Get system.L3[0..n]____________________________________________
 		w=OrderofComponents_3layer+1;
 		tmpOrderofComponents_3layer=OrderofComponents_3layer;
 		if (sys.homogeneous_L3s==1) OrderofComponents_3layer=OrderofComponents_3layer+1;
 		else OrderofComponents_3layer=OrderofComponents_3layer+sys.number_of_L3s;
 
+                NREPORT(xml_level+1, "reading %u L3 caches (homogeneous: %s)", (OrderofComponents_3layer-tmpOrderofComponents_3layer), REPORT_YESNO(sys.homogeneous_L3s));
+
+                xml_level++;
+                
 		for (i=0; i<(OrderofComponents_3layer-tmpOrderofComponents_3layer); i++)
 		{
+                        NREPORT(xml_level, "reading L3 cache %u", i+1);
 			xNode3=xNode2.getChildNode("component",w);
 			if (xNode3.isEmpty()==1) {
 				printf("The value of homogeneous_L3s or number_of_L3s is not correct!");
@@ -993,6 +1068,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 				if (strstr(xNode3.getAttribute("name"),"L3")!=NULL)
 				{
 					{ //For L30-L3i
+                                                NREPORT(xml_level+1, "reading params");
 						//Get all params with system.L3?
 						itmp=xNode3.nChildNode("param");
 						for(k=0; k<itmp; k++)
@@ -1070,6 +1146,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 							}
 						}
 						//Get all stats with system.L3?
+                                                NREPORT(xml_level+1, "reading stats");
 						itmp=xNode3.nChildNode("stat");
 						for(k=0; k<itmp; k++)
 						{
@@ -1113,14 +1190,20 @@ void ParseXML::parse(XMLNode &xMainNode)
 				}
 			}
 		}
+                xml_level--;
 		//__________________________________________Get system.NoC[0..n]____________________________________________
 		w=OrderofComponents_3layer+1;
 		tmpOrderofComponents_3layer=OrderofComponents_3layer;
 		if (sys.homogeneous_NoCs==1) OrderofComponents_3layer=OrderofComponents_3layer+1;
 		else OrderofComponents_3layer=OrderofComponents_3layer+sys.number_of_NoCs;
 
+                NREPORT(xml_level+1, "reading %u NoCs (homogeneous: %s)", (OrderofComponents_3layer-tmpOrderofComponents_3layer), REPORT_YESNO(sys.homogeneous_NoCs));
+
+                xml_level++;
+                
 		for (i=0; i<(OrderofComponents_3layer-tmpOrderofComponents_3layer); i++)
 		{
+                        NREPORT(xml_level, "reading NoC %u", i+1);
 			xNode3=xNode2.getChildNode("component",w);
 			if (xNode3.isEmpty()==1) {
 				printf("The value of homogeneous_NoCs or number_of_NoCs is not correct!");
@@ -1131,6 +1214,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 				if (strstr(xNode3.getAttribute("name"),"noc")!=NULL)
 				{
 					{ //For NoC0-NoCi
+                                                NREPORT(xml_level+1, "reading params");
 						//Get all params with system.NoC?
 						itmp=xNode3.nChildNode("param");
 						for(k=0; k<itmp; k++)
@@ -1180,11 +1264,18 @@ void ParseXML::parse(XMLNode &xMainNode)
 							if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"arbiter_type")==0) {sys.NoC[i].arbiter_type=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
 						}
 						NumofCom_4=xNode3.nChildNode("component"); //get the number of components within the third layer
-						for(j=0; j<NumofCom_4; j++)
+						
+                                                NREPORT(xml_level+1, "reading %u NoC sub-components", NumofCom_4);
+
+                                                xml_level++;
+                                                
+                                                for(j=0; j<NumofCom_4; j++)
 						{
 							xNode4=xNode3.getChildNode("component",j);
+                                                        NREPORT(xml_level, "reading %s", xNode4.getAttribute("name"));
 							if (strcmp(xNode4.getAttribute("name"),"xbar0")==0)
 							{ //find PBT
+                                                                NREPORT(xml_level+1, "reading params");
 								itmp=xNode4.nChildNode("param");
 								for(k=0; k<itmp; k++)
 								{ //get all items of param in system.XoC0.xbar0--xbar0
@@ -1214,6 +1305,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 										chtmp1[0]='\0';
 									}
 								}
+                                                                NREPORT(xml_level+1, "reading stats");
 								itmp=xNode4.nChildNode("stat");
 								for(k=0; k<itmp; k++)
 								{ //get all items of stat in system.core0.predictor--PBT
@@ -1221,7 +1313,9 @@ void ParseXML::parse(XMLNode &xMainNode)
 								}
 							}
 						}
+                                                xml_level--;
 						//Get all stats with system.NoC?
+                                                NREPORT(xml_level+1, "reading stats");
 						itmp=xNode3.nChildNode("stat");
 						for(k=0; k<itmp; k++)
 						{
@@ -1233,52 +1327,66 @@ void ParseXML::parse(XMLNode &xMainNode)
 				}
 			}
 		}
+                xml_level--;
 		//__________________________________________Get system.mem____________________________________________
-//		if (OrderofComponents_3layer>0) OrderofComponents_3layer=OrderofComponents_3layer+1;
-//		xNode3=xNode2.getChildNode("component",OrderofComponents_3layer);
-//		if (xNode3.isEmpty()==1) {
-//			printf("some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!");
-//			exit(0);
-//		}
-//		if (strstr(xNode3.getAttribute("id"),"system.mem")!=NULL)
-//		{
-//
-//			itmp=xNode3.nChildNode("param");
-//			for(k=0; k<itmp; k++)
-//			{ //get all items of param in system.mem
-//				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"mem_tech_node")==0) {sys.mem.mem_tech_node=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
-//				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"device_clock")==0) {sys.mem.device_clock=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
-//				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"peak_transfer_rate")==0) {sys.mem.peak_transfer_rate=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
-//				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"capacity_per_channel")==0) {sys.mem.capacity_per_channel=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
-//				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"number_ranks")==0) {sys.mem.number_ranks=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
-//				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"num_banks_of_DRAM_chip")==0) {sys.mem.num_banks_of_DRAM_chip=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
-//				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"Block_width_of_DRAM_chip")==0) {sys.mem.Block_width_of_DRAM_chip=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
-//				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"output_width_of_DRAM_chip")==0) {sys.mem.output_width_of_DRAM_chip=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
-//				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"page_size_of_DRAM_chip")==0) {sys.mem.page_size_of_DRAM_chip=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
-//				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"burstlength_of_DRAM_chip")==0) {sys.mem.burstlength_of_DRAM_chip=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
-//				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"internal_prefetch_of_DRAM_chip")==0) {sys.mem.internal_prefetch_of_DRAM_chip=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
-//			}
-//			itmp=xNode3.nChildNode("stat");
-//			for(k=0; k<itmp; k++)
-//			{ //get all items of stat in system.mem
-//				if (strcmp(xNode3.getChildNode("stat",k).getAttribute("name"),"memory_accesses")==0) {sys.mem.memory_accesses=atof(xNode3.getChildNode("stat",k).getAttribute("value"));continue;}
-//				if (strcmp(xNode3.getChildNode("stat",k).getAttribute("name"),"memory_reads")==0) {sys.mem.memory_reads=atof(xNode3.getChildNode("stat",k).getAttribute("value"));continue;}
-//				if (strcmp(xNode3.getChildNode("stat",k).getAttribute("name"),"memory_writes")==0) {sys.mem.memory_writes=atof(xNode3.getChildNode("stat",k).getAttribute("value"));continue;}
-//			}
-//		}
-//		else{
-//			printf("some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!");
-//			exit(0);
-//		}
+		if (OrderofComponents_3layer>0) OrderofComponents_3layer=OrderofComponents_3layer+1;
+		xNode3=xNode2.getChildNode("component",OrderofComponents_3layer);
+                
+                NREPORT(xml_level+1, "reading system.mem");
+
+                xml_level++;
+                
+		if (xNode3.isEmpty()==1) {
+			printf("<%s:%u> some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!", __FILE__, __LINE__);
+			exit(0);
+		}
+		if (strstr(xNode3.getAttribute("id"),"system.mem")!=NULL)
+		{
+                        NREPORT(xml_level+1, "reading params");
+			itmp=xNode3.nChildNode("param");
+			for(k=0; k<itmp; k++)
+			{ //get all items of param in system.mem
+				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"mem_tech_node")==0) {sys.mem.mem_tech_node=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
+				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"device_clock")==0) {sys.mem.device_clock=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
+				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"peak_transfer_rate")==0) {sys.mem.peak_transfer_rate=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
+				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"capacity_per_channel")==0) {sys.mem.capacity_per_channel=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
+				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"number_ranks")==0) {sys.mem.number_ranks=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
+				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"num_banks_of_DRAM_chip")==0) {sys.mem.num_banks_of_DRAM_chip=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
+				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"Block_width_of_DRAM_chip")==0) {sys.mem.Block_width_of_DRAM_chip=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
+				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"output_width_of_DRAM_chip")==0) {sys.mem.output_width_of_DRAM_chip=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
+				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"page_size_of_DRAM_chip")==0) {sys.mem.page_size_of_DRAM_chip=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
+				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"burstlength_of_DRAM_chip")==0) {sys.mem.burstlength_of_DRAM_chip=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
+				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"internal_prefetch_of_DRAM_chip")==0) {sys.mem.internal_prefetch_of_DRAM_chip=atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
+			}
+                        NREPORT(xml_level+1, "reading stats");
+			itmp=xNode3.nChildNode("stat");
+			for(k=0; k<itmp; k++)
+			{ //get all items of stat in system.mem
+				if (strcmp(xNode3.getChildNode("stat",k).getAttribute("name"),"memory_accesses")==0) {sys.mem.memory_accesses=atof(xNode3.getChildNode("stat",k).getAttribute("value"));continue;}
+				if (strcmp(xNode3.getChildNode("stat",k).getAttribute("name"),"memory_reads")==0) {sys.mem.memory_reads=atof(xNode3.getChildNode("stat",k).getAttribute("value"));continue;}
+				if (strcmp(xNode3.getChildNode("stat",k).getAttribute("name"),"memory_writes")==0) {sys.mem.memory_writes=atof(xNode3.getChildNode("stat",k).getAttribute("value"));continue;}
+			}
+		}
+		else{
+			printf("<%s:%u> some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct! '%s'\n", __FILE__, __LINE__, xNode3.getAttribute("id"));
+			exit(0);
+		}
+                xml_level--;
 		//__________________________________________Get system.mc____________________________________________
 		if (OrderofComponents_3layer>0) OrderofComponents_3layer=OrderofComponents_3layer+1;
 		xNode3=xNode2.getChildNode("component",OrderofComponents_3layer);
-		if (xNode3.isEmpty()==1) {
-			printf("some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!");
+		
+                NREPORT(xml_level+1, "reading system.mc");
+
+                xml_level++;
+                
+                if (xNode3.isEmpty()==1) {
+			printf("<%s:%u> component 'system.mc' is missing\n", __FILE__, __LINE__);
 			exit(0);
 		}
 		if (strstr(xNode3.getAttribute("id"),"system.mc")!=NULL)
 		{
+                        NREPORT(xml_level+1, "reading params");
 			itmp=xNode3.nChildNode("param");
 			for(k=0; k<itmp; k++)
 			{ //get all items of param in system.mem
@@ -1298,6 +1406,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"withPHY")==0) {sys.mc.withPHY=(bool)atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
 
 			}
+                        NREPORT(xml_level+1, "reading stats");
 			itmp=xNode3.nChildNode("stat");
 			for(k=0; k<itmp; k++)
 			{ //get all items of stat in system.mendirectory
@@ -1307,18 +1416,25 @@ void ParseXML::parse(XMLNode &xMainNode)
 			}
 		}
 		else{
-			printf("some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!");
-			exit(0);
+                    printf("<%s:%u> some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!", __FILE__, __LINE__);
+                    exit(0);
 		}
+                
+                xml_level--;
+                
 		//__________________________________________Get system.niu____________________________________________
 		if (OrderofComponents_3layer>0) OrderofComponents_3layer=OrderofComponents_3layer+1;
 		xNode3=xNode2.getChildNode("component",OrderofComponents_3layer);
+                NREPORT(xml_level+1, "reading system.niu");
+
+                xml_level++;
 		if (xNode3.isEmpty()==1) {
-			printf("some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!");
+			printf("<%s:%u> component 'system.niu' missing\n", __FILE__, __LINE__);
 			exit(0);
 		}
 		if (strstr(xNode3.getAttribute("id"),"system.niu")!=NULL)
 		{
+                        NREPORT(xml_level+1, "reading params");
 			itmp=xNode3.nChildNode("param");
 			for(k=0; k<itmp; k++)
 			{ //get all items of param in system.mem
@@ -1328,6 +1444,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"vdd")==0) {sys.niu.vdd=atof(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
 
 			}
+                        NREPORT(xml_level+1, "reading stats");
 			itmp=xNode3.nChildNode("stat");
 			for(k=0; k<itmp; k++)
 			{ //get all items of stat in system.mendirectory
@@ -1336,19 +1453,26 @@ void ParseXML::parse(XMLNode &xMainNode)
 			}
 		}
 		else{
-			printf("some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!");
+			printf("<%s:%u> some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!", __FILE__, __LINE__);
 			exit(0);
 		}
+                
+                xml_level--;
 
 		//__________________________________________Get system.pcie____________________________________________
 		if (OrderofComponents_3layer>0) OrderofComponents_3layer=OrderofComponents_3layer+1;
 		xNode3=xNode2.getChildNode("component",OrderofComponents_3layer);
+                
+                NREPORT(xml_level+1, "reading system.pcie");
+
+                xml_level++;
 		if (xNode3.isEmpty()==1) {
-			printf("some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!");
+			printf("<%s:%u> component 'system.pcie' missing\n", __FILE__, __LINE__);
 			exit(0);
 		}
 		if (strstr(xNode3.getAttribute("id"),"system.pcie")!=NULL)
 		{
+                        NREPORT(xml_level+1, "reading params");
 			itmp=xNode3.nChildNode("param");
 			for(k=0; k<itmp; k++)
 			{ //get all items of param in system.mem
@@ -1360,6 +1484,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"withPHY")==0) {sys.pcie.withPHY=(bool)atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
 
 			}
+                        NREPORT(xml_level+1, "reading stats");
 			itmp=xNode3.nChildNode("stat");
 			for(k=0; k<itmp; k++)
 			{ //get all items of stat in system.mendirectory
@@ -1368,18 +1493,26 @@ void ParseXML::parse(XMLNode &xMainNode)
 			}
 		}
 		else{
-			printf("some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!");
+			printf("<%s:%u> some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!", __FILE__, __LINE__);
 			exit(0);
 		}
+                
+                xml_level--;
+                
 		//__________________________________________Get system.flashcontroller____________________________________________
 		if (OrderofComponents_3layer>0) OrderofComponents_3layer=OrderofComponents_3layer+1;
 		xNode3=xNode2.getChildNode("component",OrderofComponents_3layer);
+                NREPORT(xml_level+1, "reading system.flashc");
+
+                xml_level++;
+                
 		if (xNode3.isEmpty()==1) {
-			printf("some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!");
+			printf("<%s:%u> component 'system.flashc' missing\n", __FILE__, __LINE__);
 			exit(0);
 		}
 		if (strstr(xNode3.getAttribute("id"),"system.flashc")!=NULL)
 		{
+                        NREPORT(xml_level+1, "reading params");
 			itmp=xNode3.nChildNode("param");
 			for(k=0; k<itmp; k++)
 			{ //get all items of param in system.mem
@@ -1399,6 +1532,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 				if (strcmp(xNode3.getChildNode("param",k).getAttribute("name"),"withPHY")==0) {sys.flashc.withPHY=(bool)atoi(xNode3.getChildNode("param",k).getAttribute("value"));continue;}
 
 			}
+                        NREPORT(xml_level+1, "reading stats");
 			itmp=xNode3.nChildNode("stat");
 			for(k=0; k<itmp; k++)
 			{ //get all items of stat in system.mendirectory
@@ -1411,11 +1545,14 @@ void ParseXML::parse(XMLNode &xMainNode)
 			}
 		}
 		else{
-			printf("some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!");
+			printf("<%s:%u> some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!", __FILE__, __LINE__);
 			exit(0);
 		}
+                xml_level--;
 
 	}
+        assert(xml_level == 0);
+        REPORT("-----END-----");
 }
 void ParseXML::initialize() //Initialize all
 {
