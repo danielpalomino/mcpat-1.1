@@ -22,19 +22,22 @@ void
 StreamListener::simulateEnergyConsumption()
 {
     while (readXmlRequest()) {
-        computeEnergy();
+        // Processor::computeEnergy stores a reference to the xml object,
+        // therefore, it must stay alive until both computeEnergy and
+        // displayEnergy are called.
+        std::auto_ptr<ParseXML> xml(new ParseXML);
+        xml->parse(filebuf);
+
+        computeEnergy(xml.get());
         displayEnergy();
     }
 }
  
 void
-StreamListener::computeEnergy()
+StreamListener::computeEnergy(ParseXML *xml)
 {
-
-    std::auto_ptr<ParseXML> xml(new ParseXML);
-    xml->parse(filebuf);
-    proc.computeEnergy(xml.get(), true);	// thermal design power
-    proc.computeEnergy(xml.get(), false);	// runtime dynamic
+    proc.computeEnergy(xml, true);	// thermal design power
+    proc.computeEnergy(xml, false);	// runtime dynamic
 }
 
 void

@@ -19,7 +19,7 @@ private:
     /**
      * Recomputes energy for the statistics of the latest request.
      */
-    void computeEnergy();
+    void computeEnergy(ParseXML *xml);
 
     /**
      * Displays the computed data.
