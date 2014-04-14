@@ -156,8 +156,10 @@ NIUController::NIUController(ParseXML *XML_interface,InputParameter* interface_i
 	  power_t.readOp.gate_leakage = (mac_gates + frontend_gates + frontend_gates)*cmos_Ig_leakage(NMOS_sizing, PMOS_sizing, 2, nand)*g_tp.peri_global.Vdd;//unit W
  }
 
-void NIUController::computeEnergy(bool is_tdp)
+void NIUController::computeEnergy(ParseXML * XML_conf, bool is_tdp)
 {
+    XML = XML_conf;
+	set_niu_param();
 	if (is_tdp)
     {
 
@@ -300,8 +302,10 @@ PCIeController::PCIeController(ParseXML *XML_interface,InputParameter* interface
 	  power_t.readOp.gate_leakage = (ctrl_gates + (pciep.withPHY? SerDer_gates:0))*cmos_Ig_leakage(NMOS_sizing, PMOS_sizing, 2, nand)*g_tp.peri_global.Vdd;//unit W
  }
 
-void PCIeController::computeEnergy(bool is_tdp)
+void PCIeController::computeEnergy(ParseXML * XML_conf, bool is_tdp)
 {
+    XML = XML_conf;
+	set_pcie_param();
 	if (is_tdp)
     {
 
@@ -424,8 +428,10 @@ FlashController::FlashController(ParseXML *XML_interface,InputParameter* interfa
 	  power_t.readOp.gate_leakage = ((ctrl_gates + (fcp.withPHY? SerDer_gates:0))*number_channel)*cmos_Ig_leakage(NMOS_sizing, PMOS_sizing, 2, nand)*g_tp.peri_global.Vdd;//unit W
  }
 
-void FlashController::computeEnergy(bool is_tdp)
+void FlashController::computeEnergy(ParseXML * XML_conf, bool is_tdp)
 {
+    XML = XML_conf;
+	set_fc_param();
 	if (is_tdp)
     {
 
