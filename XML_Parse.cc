@@ -38,8 +38,6 @@
 #include <iostream>
 #include "debug.h"
 
-static const bool __report_enabled = true;
-
 #define PRINT_ERROR(attribute, expected, got, hint) do { \
     std::fprintf(stderr, \
                  "Expected a component with %s %s got a component with %s %s\n%s", attribute, expected, attribute, got, hint); \

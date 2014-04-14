@@ -52,6 +52,8 @@ int main(int argc, char *argv[])
 	char *fb;
 
     bool infile_specified = false;
+    
+    bool report_parser_progress = false;
 
     int plevel = 2;
 
@@ -60,6 +62,13 @@ int main(int argc, char *argv[])
     if (argc <= 1 || argv[1] == string("-h")
 	|| argv[1] == string("--help")) {
 	print_usage(argv[0]);
+    }
+    
+    // Parse -v flag
+    if (argv[1] == string("-v")) {
+        report_parser_progress = true;
+        argv++; // shift
+        argc--;
     }
 
     for (int32_t i = 0; i < argc; i++) {
@@ -87,16 +96,12 @@ int main(int argc, char *argv[])
 	VER_UPDATE << ") is computing the target processor...\n " << endl;
 
     // parse XML-based interface
-    std::auto_ptr<ParseXML> p1(new ParseXML());
+    std::auto_ptr<ParseXML> p1(new ParseXML(report_parser_progress));
 
-    p1->parse(fb);
-    
-    
+    p1->parse(fb);    
     
     timespec start, mid, end;
- 
-
-
+    
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
 
 	Processor proc(p1.get());	// create configuration
@@ -119,7 +124,9 @@ int main(int argc, char *argv[])
 void print_usage(char *argv0)
 {
     cerr << "How to use McPAT:" << endl;
-    "  mcpat -infile <input file name> -print_level < level of details 0~5 >  -opt_for_clk < 0 (optimize for ED^2P only)/1 (optimzed for target clock rate)>";
+    cerr <<
+    "  mcpat [-v] -infile <input file name> -print_level < level of details 0~5 >  -opt_for_clk < 0 (optimize for ED^2P only)/1 (optimzed for target clock rate)>"
+    << endl;
     // cerr << " Note:default print level is at processor level, please
     // increase it to see the details" << endl;
     exit(1);
