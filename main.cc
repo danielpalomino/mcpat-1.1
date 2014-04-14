@@ -64,30 +64,23 @@ int main(int argc, char *argv[])
 	print_usage(argv[0]);
     }
     
-    // Parse -v flag
-    if (argv[1] == string("-v")) {
-        report_parser_progress = true;
-        argv++; // shift
-        argc--;
-    }
-
-    for (int32_t i = 0; i < argc; i++) {
-	if (argv[i] == string("-infile")) {
+   for (int32_t i = 1; i < argc; i++) {
+        if (argv[i] == string("-v")) {
+            report_parser_progress = true;
+        } else if (argv[i] == string("-infile")) {
 	    infile_specified = true;
 	    i++;
 	    fb = argv[i];
-	}
-
-	if (argv[i] == string("-print_level")) {
+	} else if (argv[i] == string("-print_level")) {
 	    i++;
 	    plevel = atoi(argv[i]);
-	}
-
-	if (argv[i] == string("-opt_for_clk")) {
+	} else if (argv[i] == string("-opt_for_clk")) {
 	    i++;
 	    opt_for_clk = (bool) atoi(argv[i]);
-	}
+	} else {
+            print_usage(argv[0]);
         }
+   }
     if ((infile_specified == false)) {
 	print_usage(argv[0]);
     }
