@@ -59,7 +59,7 @@ class BranchPredictor :public Component {
 	bool exist;
 
 	BranchPredictor(ParseXML *XML_interface, int ithCore_, InputParameter* interface_ip_,const CoreDynParam & dyn_p_, bool exsit=true);
-    void computeEnergy(bool is_tdp=true);
+    void computeEnergy(ParseXML * XML, const CoreDynParam & dyn_p_, bool is_tdp = true);
     void displayEnergy(uint32_t indent = 0,int plevel = 100, bool is_tdp=true);
 	~BranchPredictor();
 };
@@ -85,7 +85,7 @@ class InstFetchU :public Component {
 	bool exist;
 
 	InstFetchU(ParseXML *XML_interface, int ithCore_, InputParameter* interface_ip_,const CoreDynParam & dyn_p_, bool exsit=true);
-    void computeEnergy(bool is_tdp=true);
+    void computeEnergy(ParseXML * XML, const CoreDynParam & dyn_p_, bool is_tdp = true);
     void displayEnergy(uint32_t indent = 0,int plevel = 100, bool is_tdp=true);
 	~InstFetchU();
 };
@@ -108,7 +108,7 @@ class SchedulerU :public Component {
     bool exist;
 
     SchedulerU(ParseXML *XML_interface, int ithCore_, InputParameter* interface_ip_,const CoreDynParam & dyn_p_, bool exist_=true);
-    void computeEnergy(bool is_tdp=true);
+    void computeEnergy(ParseXML * XML, const CoreDynParam & dyn_p_, bool is_tdp = true);
     void displayEnergy(uint32_t indent = 0,int plevel = 100, bool is_tdp=true);
 	~SchedulerU();
 };
@@ -134,7 +134,7 @@ class RENAMINGU :public Component {
 
 
 	RENAMINGU(ParseXML *XML_interface, int ithCore_, InputParameter* interface_ip_, const CoreDynParam & dyn_p_, bool exist_=true);
-    void computeEnergy(bool is_tdp=true);
+    void computeEnergy(ParseXML * XML, const CoreDynParam & dyn_p_, bool is_tdp = true);
     void displayEnergy(uint32_t indent = 0,int plevel = 100, bool is_tdp=true);
 	~RENAMINGU();
 };
@@ -156,7 +156,7 @@ class LoadStoreU :public Component {
 	bool exist;
 
 	LoadStoreU(ParseXML *XML_interface, int ithCore_, InputParameter* interface_ip_,const CoreDynParam & dyn_p_, bool exist_=true);
-    void computeEnergy(bool is_tdp=true);
+    void computeEnergy(ParseXML * XML, const CoreDynParam & dyn_p_, bool is_tdp = true);
     void displayEnergy(uint32_t indent = 0,int plevel = 100, bool is_tdp=true);
 	~LoadStoreU();
 };
@@ -175,7 +175,7 @@ class MemManU :public Component {
 	bool exist;
 
 	MemManU(ParseXML *XML_interface, int ithCore_, InputParameter* interface_ip_,const CoreDynParam & dyn_p_, bool exist_=true);
-    void computeEnergy(bool is_tdp=true);
+    void computeEnergy(ParseXML * XML, const CoreDynParam & dyn_p_, bool is_tdp = true);
     void displayEnergy(uint32_t indent = 0,int plevel = 100, bool is_tdp=true);
 	~MemManU();
 };
@@ -196,7 +196,7 @@ class RegFU :public Component {
 	bool exist;
 
 	RegFU(ParseXML *XML_interface, int ithCore_, InputParameter* interface_ip_,const CoreDynParam & dyn_p_, bool exist_=true);
-    void computeEnergy(bool is_tdp=true);
+    void computeEnergy(ParseXML * XML, const CoreDynParam & dyn_p_, bool is_tdp = true);
     void displayEnergy(uint32_t indent = 0,int plevel = 100, bool is_tdp=true);
 	~RegFU();
 };
@@ -227,7 +227,7 @@ class EXECU :public Component {
 	bool exist;
 
 	EXECU(ParseXML *XML_interface, int ithCore_, InputParameter* interface_ip_, double lsq_height_,const CoreDynParam & dyn_p_, bool exist_=true);
-    void computeEnergy(bool is_tdp=true);
+    void computeEnergy(ParseXML * XML, const CoreDynParam & dyn_p_, bool is_tdp = true);
 	void displayEnergy(uint32_t indent = 0,int plevel = 100, bool is_tdp=true);
 	~EXECU();
 };
@@ -254,7 +254,7 @@ class Core :public Component {
     //clock_network	clockNetwork;
 	Core(ParseXML *XML_interface, int ithCore_, InputParameter* interface_ip_);
 	void set_core_param();
-	void computeEnergy(bool is_tdp=true);
+	void computeEnergy(ParseXML * XML_conf, bool is_tdp = true);
 	void displayEnergy(uint32_t indent = 0,int plevel = 100, bool is_tdp=true);
 	~Core();
 };
