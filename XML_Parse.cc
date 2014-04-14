@@ -38,6 +38,20 @@
 
 using namespace std;
 
+void ParseXML::parse(const std::string &filebuffer)
+{
+    XMLResults status = { eXMLErrorNone, 0, 0 };
+    XMLNode xMainNode=XMLNode::parseString(filebuffer.c_str(),"component", &status); //the 'component' in the first layer
+
+    if (status.error != eXMLErrorNone) {
+        std::cerr << "Error in XML data Line " << status.nLine
+                  << " Column " << status.nColumn
+                  << XMLNode::getError(status.error) << std::endl;
+    }
+
+    parse(xMainNode);
+}
+
 void ParseXML::parse(const char* filepath)
 {
     // this open and parse the XML file:

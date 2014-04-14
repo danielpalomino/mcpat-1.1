@@ -30,6 +30,10 @@
  ***************************************************************************/
 #include "io.h"
 #include <iostream>
+#include <algorithm>
+#include <iterator>
+#include <fstream>
+#include <string>
 #include <ctime>
 #include "xmlParser.h"
 #include "XML_Parse.h"
@@ -96,8 +100,20 @@ int main(int argc, char *argv[])
 
     p1->parse(fb);
     ParseXML *p2 = new ParseXML();
+    
+    std::ifstream ifs(fb2);
+    if (!ifs) {
+        std::cerr << "Error: could not open file '" << fb2 << "'\n";
+        return EXIT_FAILURE;
+    }
 
-    p2->parse(fb2);
+    ifs.unsetf(std::ios_base::skipws);
+
+    std::string filebuf;
+    std::copy(std::istream_iterator<char>(ifs), std::istream_iterator<char>(), std::back_inserter(filebuf));
+
+    p2->parse(filebuf);
+    
     timespec start, mid, end;
  
 

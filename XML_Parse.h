@@ -590,6 +590,7 @@ class ParseXML
     void parse(XMLNode &xMainNode);
 public:
 	void parse(const char* filepath);
+        void parse(const std::string &filebuffer);
     void initialize();
 public:
 	root_system sys;
