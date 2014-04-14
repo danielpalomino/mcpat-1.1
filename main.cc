@@ -32,6 +32,7 @@
 #include <iostream>
 #include <ctime>
 #include <fstream>
+#include <memory>
 #include "xmlParser.h"
 #include "XML_Parse.h"
 #include "processor.h"
@@ -50,10 +51,7 @@ int main(int argc, char *argv[])
 {
 	char *fb;
 
-    char *fb2;
-
     bool infile_specified = false;
-    bool infile2_specified = false;
 
     int plevel = 2;
 
@@ -71,11 +69,6 @@ int main(int argc, char *argv[])
 	    fb = argv[i];
 	}
 
-	if (argv[i] == string("-infile2")) {
-		infile2_specified = true;
-	    i++;
-	    fb2 = argv[i];
-	}
 	if (argv[i] == string("-print_level")) {
 	    i++;
 	    plevel = atoi(argv[i]);
@@ -86,7 +79,7 @@ int main(int argc, char *argv[])
 	    opt_for_clk = (bool) atoi(argv[i]);
 	}
         }
-    if ((infile_specified == false) || (infile2_specified == false)) {
+    if ((infile_specified == false)) {
 	print_usage(argv[0]);
     }
 
@@ -94,15 +87,11 @@ int main(int argc, char *argv[])
 	VER_UPDATE << ") is computing the target processor...\n " << endl;
 
     // parse XML-based interface
-    ParseXML *p1 = new ParseXML();
+    std::auto_ptr<ParseXML> p1(new ParseXML());
 
     p1->parse(fb);
     
-    std::ifstream ifs(fb2);
-    if (!ifs) {
-        std::cerr << "Error: could not open file '" << fb2 << "'\n";
-        return EXIT_FAILURE;
-    }
+    
     
     timespec start, mid, end;
  
@@ -110,20 +99,16 @@ int main(int argc, char *argv[])
 
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
 
-	Processor proc(p1);		// create configuration
+	Processor proc(p1.get());	// create configuration
 
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &mid);
 
-    Streamlistener listener(ifs);
-
-    listener.computeEnergy(proc);
+    StreamListener listener(std::cin, proc);
+    listener.simulateEnergyConsumption();
     
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 
-    delete p1;
-
-    cout << diff(start, mid).tv_sec << ":" << diff(start,
-						   mid).tv_nsec << endl;
+    cout << diff(start, mid).tv_sec << ":" << diff(start, mid).tv_nsec << endl;
     cout << diff(mid, end).tv_sec << ":" << diff(mid, end).tv_nsec << endl;
     cout << diff(start, end).tv_sec << ":" << diff(start,
 						   end).tv_nsec << endl;
@@ -134,9 +119,7 @@ int main(int argc, char *argv[])
 void print_usage(char *argv0)
 {
     cerr << "How to use McPAT:" << endl;
-    cerr <<
-	"  mcpat -infile <input file name> -infile2 <input file name> -print_level < level of details 0~5 >  -opt_for_clk < 0 (optimize for ED^2P only)/1 (optimzed for target clock rate)>"
-	<< endl;
+    "  mcpat -infile <input file name> -print_level < level of details 0~5 >  -opt_for_clk < 0 (optimize for ED^2P only)/1 (optimzed for target clock rate)>";
     // cerr << " Note:default print level is at processor level, please
     // increase it to see the details" << endl;
     exit(1);
