@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &mid);
 
     StreamListener listener(std::cin, proc);
-    listener.simulateEnergyConsumption();
+    listener.energyCalculationLoop();
     
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 

@@ -19,7 +19,7 @@ StreamListener::StreamListener(std::istream &in, Processor &proc, int verbosity)
 const std::string StreamListener::endtag("</component>");
 
 void
-StreamListener::simulateEnergyConsumption()
+StreamListener::energyCalculationLoop()
 {
     while (readXmlRequest()) {
         // Processor::computeEnergy stores a reference to the xml object,

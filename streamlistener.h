@@ -7,7 +7,7 @@ class StreamListener
 public:
     StreamListener(std::istream &in, Processor &proc, int verbosity = 2);
 
-    void simulateEnergyConsumption();
+    void energyCalculationLoop();
 private:
     
     /**
