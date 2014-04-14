@@ -30,14 +30,12 @@
  ***************************************************************************/
 #include "io.h"
 #include <iostream>
-#include <algorithm>
-#include <iterator>
-#include <fstream>
-#include <string>
 #include <ctime>
+#include <fstream>
 #include "xmlParser.h"
 #include "XML_Parse.h"
 #include "processor.h"
+#include "streamlistener.h"
 #include "globalvar.h"
 #include "version.h"
 
@@ -99,20 +97,12 @@ int main(int argc, char *argv[])
     ParseXML *p1 = new ParseXML();
 
     p1->parse(fb);
-    ParseXML *p2 = new ParseXML();
     
     std::ifstream ifs(fb2);
     if (!ifs) {
         std::cerr << "Error: could not open file '" << fb2 << "'\n";
         return EXIT_FAILURE;
     }
-
-    ifs.unsetf(std::ios_base::skipws);
-
-    std::string filebuf;
-    std::copy(std::istream_iterator<char>(ifs), std::istream_iterator<char>(), std::back_inserter(filebuf));
-
-    p2->parse(filebuf);
     
     timespec start, mid, end;
  
@@ -124,17 +114,13 @@ int main(int argc, char *argv[])
 
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &mid);
 
-    proc.computeEnergy(p2, true);	// thermal design power
-    proc.computeEnergy(p2, false);	// runtime dynamic
-    proc.collectEnergy();
+    Streamlistener listener(ifs);
 
+    listener.computeEnergy(proc);
+    
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 
-    proc.displayEnergy(2, plevel);
-
     delete p1;
-
-    delete p2;
 
     cout << diff(start, mid).tv_sec << ":" << diff(start,
 						   mid).tv_nsec << endl;
