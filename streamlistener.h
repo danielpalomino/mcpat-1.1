@@ -25,6 +25,13 @@ private:
      * successful, else false (typically if EOF was reached).
      */
     bool readXmlRequest();
+    
+
+    /**
+     * Handles all necessary steps to compute the energy statistics and
+     * printing them to the output stream.
+     */
+    void processRequest(ParseXML *xml);
 
     /**
      * Recomputes energy for the statistics of the latest request.
