@@ -40,6 +40,11 @@
 
 static const bool __report_enabled = true;
 
+#define PRINT_ERROR(attribute, expected, got, hint) do { \
+    std::fprintf(stderr, \
+                 "Expected a component with %s %s got a component with %s %s\n%s", attribute, expected, attribute, got, hint); \
+} while (0)
+
 using namespace std;
 
 void ParseXML::parse(const std::string &filebuffer)
@@ -162,7 +167,7 @@ void ParseXML::parse(XMLNode &xMainNode)
                     NREPORT(xml_level, "reading core %u", i+1);
 			xNode3=xNode2.getChildNode("component",i);
 			if (xNode3.isEmpty()==1) {
-				printf("The value of homogeneous_cores or number_of_cores is not correct!");
+				PRINT_ERROR("name", "system.core", "no content", "sanity check your input file");
 				exit(0);
 			}
 			else{
@@ -643,7 +648,8 @@ void ParseXML::parse(XMLNode &xMainNode)
                                         xml_level--;
 				}
 				else {
-					printf("The value of homogeneous_cores or number_of_cores is not correct!");
+					PRINT_ERROR("name", "system.core", xNode3.getAttribute("name"),
+                                                    "Does number_of_cores/homogeneous_cores match the number of system.core components?");
 					exit(0);
 				}
 			}
@@ -667,7 +673,7 @@ void ParseXML::parse(XMLNode &xMainNode)
                     NREPORT(xml_level, "reading L1 directory %d", i+1);
 			xNode3=xNode2.getChildNode("component",w);
 			if (xNode3.isEmpty()==1) {
-				printf("The value of homogeneous_L1Directories or number_of_L1Directories is not correct!");
+				PRINT_ERROR("id", "L1Directory", "no content", "sanity check your input file");
 				exit(0);
 			}
 			else
@@ -767,7 +773,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 					w=w+1;
 				}
 				else {
-					printf("The value of homogeneous_L1Directories or number_of_L1Directories is not correct!");
+					PRINT_ERROR("id", "L1Directory", xNode3.getAttribute("id"),
+                                                    "Does number_of_L1Directories/homogeneous_L1Directorys match ne number of L1Directory components?");
 					exit(0);
 				}
 			}
@@ -791,7 +798,7 @@ void ParseXML::parse(XMLNode &xMainNode)
                         NREPORT(xml_level, "reading L2 directory %u", i+1);
 			xNode3=xNode2.getChildNode("component",w);
 			if (xNode3.isEmpty()==1) {
-				printf("The value of homogeneous_L2Directories or number_of_L2Directories is not correct!");
+				PRINT_ERROR("id", "L2Directory", "no content", "sanity check your input file");
 				exit(0);
 			}
 			else
@@ -891,7 +898,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 					w=w+1;
 				}
 				else {
-					printf("The value of homogeneous_L2Directories or number_of_L2Directories is not correct!");
+					PRINT_ERROR("id", "L2Directory", xNode3.getAttribute("id"),
+                                                    "Does number_of_L2Directories/homogeneous_L2Directorys match the number of L2Directory components?");
 					exit(0);
 				}
 			}
@@ -914,7 +922,7 @@ void ParseXML::parse(XMLNode &xMainNode)
                         NREPORT(xml_level, "reading L2 cache %u", i+1);
 			xNode3=xNode2.getChildNode("component",w);
 			if (xNode3.isEmpty()==1) {
-				printf("The value of homogeneous_L2s or number_of_L2s is not correct!");
+				PRINT_ERROR("name", "L2", "no content", "sanity check your input file");
 				exit(0);
 			}
 			else
@@ -1039,7 +1047,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 					w=w+1;
 				}
 				else {
-					printf("The value of homogeneous_L2s or number_of_L2s is not correct!");
+					PRINT_ERROR("name", "L2", xNode3.getAttribute("name"),
+                                                    "Does number_of_L2s/homogeneous_L2s match the number of L2 components?");
 					exit(0);
 				}
 			}
@@ -1060,7 +1069,7 @@ void ParseXML::parse(XMLNode &xMainNode)
                         NREPORT(xml_level, "reading L3 cache %u", i+1);
 			xNode3=xNode2.getChildNode("component",w);
 			if (xNode3.isEmpty()==1) {
-				printf("The value of homogeneous_L3s or number_of_L3s is not correct!");
+				PRINT_ERROR("name", "L3", "no content", "sanity check your input file");
 				exit(0);
 			}
 			else
@@ -1185,7 +1194,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 					w=w+1;
 				}
 				else {
-					printf("The value of homogeneous_L3s or number_of_L3s is not correct!");
+					PRINT_ERROR("name", "L3", xNode3.getAttribute("name"),
+                                                    "Does the number_of_L3s/homogeneous_L3s match the number of L3 components?");
 					exit(0);
 				}
 			}
@@ -1206,7 +1216,7 @@ void ParseXML::parse(XMLNode &xMainNode)
                         NREPORT(xml_level, "reading NoC %u", i+1);
 			xNode3=xNode2.getChildNode("component",w);
 			if (xNode3.isEmpty()==1) {
-				printf("The value of homogeneous_NoCs or number_of_NoCs is not correct!");
+				PRINT_ERROR("name", "noc", "no content", "sanity check your input file");
 				exit(0);
 			}
 			else
@@ -1325,6 +1335,11 @@ void ParseXML::parse(XMLNode &xMainNode)
 					}
 					w=w+1;
 				}
+                                else {
+                                        PRINT_ERROR("name", "noc", xNode3.getAttribute("name"),
+                                                    "Does the number_of_NoCs/homogeneous_NoCs match the number of NoC components?");
+					//exit(0); // <--- This else branch is not part of vanilla McPat
+				}
 			}
 		}
                 xml_level--;
@@ -1337,7 +1352,7 @@ void ParseXML::parse(XMLNode &xMainNode)
                 xml_level++;
                 
 		if (xNode3.isEmpty()==1) {
-			printf("<%s:%u> some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!", __FILE__, __LINE__);
+			PRINT_ERROR("id", "system.mem", "no content", "sanity check your input file");
 			exit(0);
 		}
 		if (strstr(xNode3.getAttribute("id"),"system.mem")!=NULL)
@@ -1368,7 +1383,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 			}
 		}
 		else{
-			printf("<%s:%u> some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct! '%s'\n", __FILE__, __LINE__, xNode3.getAttribute("id"));
+			PRINT_ERROR("id", "system.mem", xNode3.getAttribute("id"),
+                                    "Make sure that the number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs values match the components preceeding the system.mem component.");
 			exit(0);
 		}
                 xml_level--;
@@ -1381,7 +1397,7 @@ void ParseXML::parse(XMLNode &xMainNode)
                 xml_level++;
                 
                 if (xNode3.isEmpty()==1) {
-			printf("<%s:%u> component 'system.mc' is missing\n", __FILE__, __LINE__);
+			PRINT_ERROR("id", "system.mc", "no content", "sanity check your input file");
 			exit(0);
 		}
 		if (strstr(xNode3.getAttribute("id"),"system.mc")!=NULL)
@@ -1416,7 +1432,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 			}
 		}
 		else{
-                    printf("<%s:%u> some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!", __FILE__, __LINE__);
+                    PRINT_ERROR("id", "system.mc", xNode3.getAttribute("id"),
+                                    "Make sure that the number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs values match the components preceeding the system.mc component. And that system.mem is preceeding system.mc");
                     exit(0);
 		}
                 
@@ -1429,7 +1446,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 
                 xml_level++;
 		if (xNode3.isEmpty()==1) {
-			printf("<%s:%u> component 'system.niu' missing\n", __FILE__, __LINE__);
+			PRINT_ERROR("id", "system.niu", "no content", "sanity check your input file");
 			exit(0);
 		}
 		if (strstr(xNode3.getAttribute("id"),"system.niu")!=NULL)
@@ -1453,7 +1470,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 			}
 		}
 		else{
-			printf("<%s:%u> some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!", __FILE__, __LINE__);
+			PRINT_ERROR("id", "system.niu", xNode3.getAttribute("id"),
+                                    "Make sure that the number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs values match the components preceeding the system.niu component. And that system.mem and system.mc is preceeding system.niu");
 			exit(0);
 		}
                 
@@ -1467,7 +1485,7 @@ void ParseXML::parse(XMLNode &xMainNode)
 
                 xml_level++;
 		if (xNode3.isEmpty()==1) {
-			printf("<%s:%u> component 'system.pcie' missing\n", __FILE__, __LINE__);
+			PRINT_ERROR("id", "system.pcie", "no content", "sanity check your input file");
 			exit(0);
 		}
 		if (strstr(xNode3.getAttribute("id"),"system.pcie")!=NULL)
@@ -1493,7 +1511,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 			}
 		}
 		else{
-			printf("<%s:%u> some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!", __FILE__, __LINE__);
+			PRINT_ERROR("id", "system.pcie", xNode3.getAttribute("id"),
+                                    "Make sure that the number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs values match the components preceeding the system.pcie component. And that system.mem, system.mc and system.niu is preceeding system.pcie");
 			exit(0);
 		}
                 
@@ -1507,7 +1526,7 @@ void ParseXML::parse(XMLNode &xMainNode)
                 xml_level++;
                 
 		if (xNode3.isEmpty()==1) {
-			printf("<%s:%u> component 'system.flashc' missing\n", __FILE__, __LINE__);
+			PRINT_ERROR("id", "system.flashc", "no content", "sanity check your input file");
 			exit(0);
 		}
 		if (strstr(xNode3.getAttribute("id"),"system.flashc")!=NULL)
@@ -1545,7 +1564,8 @@ void ParseXML::parse(XMLNode &xMainNode)
 			}
 		}
 		else{
-			printf("<%s:%u> some value(s) of number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs is/are not correct!", __FILE__, __LINE__);
+			PRINT_ERROR("id", "system.flashc", xNode3.getAttribute("id"),
+                                    "Make sure that the number_of_cores/number_of_L2s/number_of_L3s/number_of_NoCs values match the components preceeding the system.flashc component. And that system.mem, system.mc, system.niu and system.pcie is preceeding system.flashc");
 			exit(0);
 		}
                 xml_level--;
