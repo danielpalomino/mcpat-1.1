@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 
     Timer::global().round("config");
 
-    StreamListener listener(std::cin, proc);
+    StreamListener listener(std::cin, proc, plevel);
     listener.energyCalculationLoop();
     
     cout << Timer::global();
