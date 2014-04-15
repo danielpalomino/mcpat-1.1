@@ -37,7 +37,6 @@ mcpat_SOURCES += streamlistener.cc
 mcpat_SOURCES += streamlistener.h
 mcpat_SOURCES += timer.h
 mcpat_SOURCES += timer.cc
-mcpat_SOURCES += technology_xeon_core.cc
 mcpat_SOURCES += version.h
 mcpat_SOURCES += XML_Parse.cc
 mcpat_SOURCES += XML_Parse.h

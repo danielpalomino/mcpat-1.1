@@ -17,3 +17,6 @@ config.log
 cacti/.deps/
 cacti/Makefile
 config.status
+cacti/cacti
+cacti/libcacti.a
+cacti/obj_opt/
