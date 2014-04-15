@@ -74,6 +74,9 @@ StreamListener::displayEnergy()
 {
     proc.collectEnergy();
     proc.displayEnergy(2, verbosity);
+    // Make sure that parts of a McPat report don't stay in the buffer, until
+    // the output of the next report fill it up.
+    std::cout.flush();
 }
 
 bool
@@ -86,6 +89,7 @@ StreamListener::readXmlRequest()
     while (in && line != endtag) {
         std::getline(in, line);
         filebuf += line;
+        filebuf += "\n";
     }
 
     return line == endtag;
