@@ -11,3 +11,9 @@ configure
 depcomp
 install-sh
 missing
+.deps/
+Makefile
+config.log
+cacti/.deps/
+cacti/Makefile
+config.status
