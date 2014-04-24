@@ -91,7 +91,6 @@ StreamListener::readXmlRequest()
     while (in && line != endtag) {
         std::getline(in, line);
         filebuf += line;
-        filebuf += "\n";
     }
 
     return line == endtag;
