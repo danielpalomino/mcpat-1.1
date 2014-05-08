@@ -3990,7 +3990,8 @@ void Core::displayEnergy(uint32_t indent,int plevel,bool is_tdp)
 				<< (long_channel? mmu->power.readOp.longer_channel_leakage:mmu->power.readOp.leakage)   << " W" << endl;
 			if (power_gating) cout << indent_str_next << "Subthreshold Leakage with power gating = "
 					<< (long_channel? mmu->power.readOp.power_gated_with_long_channel_leakage : mmu->power.readOp.power_gated_leakage)  << " W" << endl;
-			cout << indent_str_next << "Runtime Dynamic = " << mmu->rt_power.readOp.dynamic/executionTime << " W" << endl;
+			cout << indent_str_next << "Gate Leakage = " << mmu->power.readOp.gate_leakage  << " W" << endl;
+                        cout << indent_str_next << "Runtime Dynamic = " << mmu->rt_power.readOp.dynamic/executionTime << " W" << endl;
 			cout <<endl;
 			if (plevel >2){
 				mmu->displayEnergy(indent+4,plevel,is_tdp);
@@ -4005,7 +4006,8 @@ void Core::displayEnergy(uint32_t indent,int plevel,bool is_tdp)
 				<< (long_channel? exu->power.readOp.longer_channel_leakage:exu->power.readOp.leakage)   << " W" << endl;
 			if (power_gating) cout << indent_str_next << "Subthreshold Leakage with power gating = "
 					<< (long_channel? exu->power.readOp.power_gated_with_long_channel_leakage : exu->power.readOp.power_gated_leakage)  << " W" << endl;
-			cout << indent_str_next << "Runtime Dynamic = " << exu->rt_power.readOp.dynamic/executionTime << " W" << endl;
+			cout << indent_str_next << "Gate Leakage = " << exu->power.readOp.gate_leakage  << " W" << endl;
+                        cout << indent_str_next << "Runtime Dynamic = " << exu->rt_power.readOp.dynamic/executionTime << " W" << endl;
 			cout <<endl;
 			if (plevel >2){
 				exu->displayEnergy(indent+4,plevel,is_tdp);
